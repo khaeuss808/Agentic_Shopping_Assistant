@@ -1,0 +1,10 @@
+streamlit
+langchain
+langgraph
+openai
+pydantic
+python-dotenv
+numpy
+pandas
+faiss-cpu
+tqdm
