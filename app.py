@@ -1,5 +1,5 @@
 import streamlit as st
-from agent.tools import search_catalog
+from agent.tools import search_catalog, parse_constraints, filter_results
 
 st.set_page_config(page_title="Agentic Shopping Assistant", layout="wide")
 st.title("🛍️ Agentic Shopping Assistant (Fashion)")
@@ -10,13 +10,24 @@ query = st.text_input(
 top_k = st.slider("Number of results", 3, 12, 8)
 
 if st.button("Search catalog"):
-    results = search_catalog(query, top_k=top_k)
+    constraints = parse_constraints(query)
+    st.subheader("Parsed constraints")
+    st.json(
+        {
+            "budget_max": constraints.budget_max,
+            "colors": constraints.colors,
+            "categories": constraints.categories,
+        }
+    )
 
-    if not results:
-        st.warning("No matches found.")
+    results = search_catalog(query, top_k=top_k)
+    filtered = filter_results(results, constraints)
+
+    if not filtered:
+        st.warning("No matches found after applying constraints.")
     else:
-        st.subheader("Results")
-        for res in results:
+        st.subheader("Results (after constraints)")
+        for res in filtered:
             item = res.item
             with st.container(border=True):
                 st.markdown(
